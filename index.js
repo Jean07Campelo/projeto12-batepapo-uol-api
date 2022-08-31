@@ -8,8 +8,12 @@ const port = 5000;
 
 
 server.post('/participants', (req, res) => {
+    const { name } = req.body;
     
-    
+    if (!name || typeof(name) !== 'string') {
+        return res.send(422);
+    }
+    res.send(201);
 })
 
 
