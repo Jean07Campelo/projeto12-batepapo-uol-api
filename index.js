@@ -7,4 +7,10 @@ server.use(express.json());
 const port = 5000;
 
 
+server.post('/participants', (req, res) => {
+    
+    
+})
+
+
 server.listen(port, () => console.log(`Listening on port ${port}`));
