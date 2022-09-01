@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { MongoClient } from "mongodb";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
 const server = express();
@@ -11,36 +11,28 @@ const port = 5000;
 const mongoClient = new MongoClient(process.env.MONGO_URI);
 
 let db;
-mongoClient.connect().then(()=>{
-  db = mongoClient.db('test');
+mongoClient.connect().then(() => {
+  db = mongoClient.db("test");
 });
 
-const users = [
-  { name: "nameTest1" },
-  { name: "nameTest2" },
-  { name: "corvus" },
-];
 server.post("/participants", (req, res) => {
   const { name } = req.body;
 
   if (!name || typeof name !== "string") {
-    res.status(422);
-  } 
-
-  const nameExisting = users.find((user) => user.name === name);
-  if (nameExisting) {
-    res.status(409).send({ error: "Nome de usuário já cadastrado" });
+    res.sendStatus(422);
+    return
   }
 
-  res.status(201);
+  res.sendStatus(201);
 });
 
-//apenas teste de conexão com o banco
-server.get('/participants', (req, res) => {
-  db.collection("dataUOL").find().toArray().then(response => 
-    {
-      res.send(response)
+server.get("/participants", (req, res) => {
+  db.collection("dataUOL")
+    .find()
+    .toArray()
+    .then((response) => {
+      res.send(response);
     });
-})
+});
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
