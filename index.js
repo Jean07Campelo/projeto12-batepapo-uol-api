@@ -15,8 +15,17 @@ mongoClient.connect().then(() => {
   db = mongoClient.db("test");
 });
 
-server.post("/participants", (req, res) => {
+server.post("/participants", async (req, res) => {
   const { name } = req.body;
+
+  try {
+    const dataUsers = await db.collection("uol_participants").find().toArray();
+    const nameExisting = dataUsers.find((user) => user.name === name);
+
+    if (nameExisting) return res.send(409);
+  } catch (error) {
+    console.log(error);
+  }
 
   if (!name || typeof name !== "string") {
     res.sendStatus(422);
