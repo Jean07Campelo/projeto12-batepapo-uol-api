@@ -1,8 +1,13 @@
 import express from "express";
 import cors from "cors";
 import { MongoClient } from "mongodb";
+import joi from "joi";
 import dotenv from "dotenv";
 dotenv.config();
+
+const userSchema = joi.object({
+  name: joi.string().required(),
+});
 
 const server = express();
 server.use(cors());
@@ -18,25 +23,29 @@ mongoClient.connect().then(() => {
 server.post("/participants", async (req, res) => {
   const { name } = req.body;
 
+  //valida usuario com lib joi:
+  const validationName = userSchema.validate(req.body, { abortEarly: true });
+
+  if (validationName.error) {
+    const errors = validationName.error.details.map(detail => detail.message);
+    res.status(400).send(errors);
+    return;
+  }
+
   try {
     const dataUsers = await db.collection("uol_participants").find().toArray();
     const nameExisting = dataUsers.find((user) => user.name === name);
 
-    //valida usuário existente
+    //valida usuário existente:
     if (nameExisting) return res.send(409);
 
     //salva participante no banco:
-    db.collection("uol_participants").insert({
+    db.collection("uol_participants").insertOne({
       name: name,
       lastStatus: Date.now(),
     });
   } catch (error) {
     console.log(error);
-  }
-
-  if (!name || typeof name !== "string") {
-    res.sendStatus(422);
-    return;
   }
 
   res.sendStatus(201);
