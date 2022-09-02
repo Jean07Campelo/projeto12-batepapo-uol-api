@@ -22,14 +22,21 @@ server.post("/participants", async (req, res) => {
     const dataUsers = await db.collection("uol_participants").find().toArray();
     const nameExisting = dataUsers.find((user) => user.name === name);
 
+    //valida usuário existente
     if (nameExisting) return res.send(409);
+
+    //salva participante no banco:
+    db.collection("uol_participants").insert({
+      name: name,
+      lastStatus: Date.now(),
+    });
   } catch (error) {
     console.log(error);
   }
 
   if (!name || typeof name !== "string") {
     res.sendStatus(422);
-    return
+    return;
   }
 
   res.sendStatus(201);
