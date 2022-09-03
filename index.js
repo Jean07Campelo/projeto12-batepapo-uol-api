@@ -10,6 +10,12 @@ const userSchema = joi.object({
   name: joi.string().required(),
 });
 
+const messageSchema = joi.object({
+  to: joi.string().required(),
+  text: joi.string().required(),
+  type: joi.string().required(),
+});
+
 const server = express();
 server.use(cors());
 server.use(express.json());
@@ -25,7 +31,7 @@ server.post("/participants", async (req, res) => {
   const { name } = req.body;
 
   //valida usuario com lib joi:
-  const validationName = userSchema.validate(req.body, { abortEarly: true });
+  const validationName = userSchema.validate(req.body, { abortEarly: false });
 
   if (validationName.error) {
     const errors = validationName.error.details.map((detail) => detail.message);
@@ -55,7 +61,6 @@ server.post("/participants", async (req, res) => {
       type: "status",
       time: time,
     });
-
   } catch (error) {
     console.log(error);
   }
@@ -76,6 +81,18 @@ server.post("/messages", (req, res) => {
   const { to, text, type } = req.body;
   const from = req.headers.user;
 
+  //validação
+  const validateMessage = messageSchema.validate(req.body, {
+    abortEarly: false,
+  });
+  if (validateMessage.error) {
+    const errors = validateMessage.error.details.map(
+      (detail) => detail.message
+    );
+    res.status(422).send(errors);
+    return;
+  }
+  res.send(201);
 });
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
