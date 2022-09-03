@@ -119,4 +119,13 @@ server.post("/messages", async (req, res) => {
   res.sendStatus(201);
 });
 
+server.get("/messages", async (req, res) => {
+  try {
+    const messages = await db.collection("uol_messages").find().toArray();
+    res.send(messages);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
 server.listen(port, () => console.log(`Listening on port ${port}`));
