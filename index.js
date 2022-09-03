@@ -74,7 +74,8 @@ server.get("/participants", (req, res) => {
 
 server.post("/messages", (req, res) => {
   const { to, text, type } = req.body;
-  
+  const from = req.headers.user;
+
 });
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
