@@ -41,13 +41,13 @@ server.post("/participants", async (req, res) => {
     if (nameExisting) return res.send(409);
 
     //salva participante no banco:
-    const time = dayjs(Date.now()).format("HH:mm:ss");
     db.collection("uol_participants").insertOne({
       name: name,
       lastStatus: Date.now(),
     });
 
     //salvando status participante
+    const time = dayjs(Date.now()).format("HH:mm:ss");
     db.collection("uol_status").insertOne({
       from: name,
       to: "Todos",
@@ -70,6 +70,11 @@ server.get("/participants", (req, res) => {
     .then((response) => {
       res.send(response);
     });
+});
+
+server.post("/messages", (req, res) => {
+  const { to, text, type } = req.body;
+  
 });
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
