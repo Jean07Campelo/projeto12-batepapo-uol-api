@@ -106,6 +106,16 @@ server.post("/messages", async (req, res) => {
     return;
   }
 
+  //salvando mensagem no banco
+  const time = dayjs(Date.now()).format("HH:mm:ss");
+  db.collection("uol_messages").insertOne({
+    to,
+    text,
+    type,
+    from,
+    time,
+  });
+
   res.sendStatus(201);
 });
 
