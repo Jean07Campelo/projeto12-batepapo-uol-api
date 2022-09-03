@@ -44,8 +44,18 @@ server.post("/participants", async (req, res) => {
     const time = dayjs(Date.now()).format("HH:mm:ss");
     db.collection("uol_participants").insertOne({
       name: name,
-      lastStatus: time,
+      lastStatus: Date.now(),
     });
+
+    //salvando status participante
+    db.collection("uol_status").insertOne({
+      from: name,
+      to: "Todos",
+      text: "entra na sala...",
+      type: "status",
+      time: time,
+    });
+
   } catch (error) {
     console.log(error);
   }
