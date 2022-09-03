@@ -70,18 +70,31 @@ server.post("/participants", async (req, res) => {
 
 server.get("/participants", async (req, res) => {
   try {
-    const participants = db.collection("uol_participants").find().toArray();
+    const participants = await db.collection("uol_participants").find().toArray();
     res.send(participants);
   } catch (error) {
     res.status(500);
   }
 });
 
-server.post("/messages", (req, res) => {
+server.post("/messages", async (req, res) => {
   const { to, text, type } = req.body;
   const from = req.headers.user;
 
-  //validação
+  //valida usuario FROM
+  try {
+    const userExisting = await db
+      .collection("uol_participants")
+      .find({ name: from });
+
+    if (!userExisting) {
+      res.send({ error: "user não está na sala" });
+    }
+  } catch (error) {
+    res.sendStatus(500);
+  }
+
+  //valida campos da mensagem
   const validateMessage = messageSchema.validate(req.body, {
     abortEarly: false,
   });
@@ -92,7 +105,8 @@ server.post("/messages", (req, res) => {
     res.status(422).send(errors);
     return;
   }
-  res.send(201);
+
+  res.sendStatus(201);
 });
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
