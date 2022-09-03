@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { MongoClient } from "mongodb";
 import joi from "joi";
+import dayjs from "dayjs";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -27,7 +28,7 @@ server.post("/participants", async (req, res) => {
   const validationName = userSchema.validate(req.body, { abortEarly: true });
 
   if (validationName.error) {
-    const errors = validationName.error.details.map(detail => detail.message);
+    const errors = validationName.error.details.map((detail) => detail.message);
     res.status(400).send(errors);
     return;
   }
@@ -40,9 +41,10 @@ server.post("/participants", async (req, res) => {
     if (nameExisting) return res.send(409);
 
     //salva participante no banco:
+    const time = dayjs(Date.now()).format("HH:mm:ss");
     db.collection("uol_participants").insertOne({
       name: name,
-      lastStatus: Date.now(),
+      lastStatus: time,
     });
   } catch (error) {
     console.log(error);
