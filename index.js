@@ -68,13 +68,13 @@ server.post("/participants", async (req, res) => {
   res.sendStatus(201);
 });
 
-server.get("/participants", (req, res) => {
-  db.collection("dataUOL")
-    .find()
-    .toArray()
-    .then((response) => {
-      res.send(response);
-    });
+server.get("/participants", async (req, res) => {
+  try {
+    const participants = db.collection("uol_participants").find().toArray();
+    res.send(participants);
+  } catch (error) {
+    res.status(500);
+  }
 });
 
 server.post("/messages", (req, res) => {
