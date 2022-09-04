@@ -181,6 +181,15 @@ setInterval(async () => {
     const timeNow = Date.now();
     if (timeNow - user.lastStatus <= 10000) {
       await db.collection("uol_participants").deleteOne({ name: user.name });
+      //salvando status de saida
+      const time = dayjs(timeNow).format("HH:mm:ss");
+      db.collection("uol_messages").insertOne({
+        from: user.name,
+        to: "Todos",
+        text: "sai da sala...",
+        type: "status",
+        time: time,
+      });
     }
   }
 }, 15000);
