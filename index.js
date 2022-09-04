@@ -65,7 +65,7 @@ server.post("/participants", async (req, res) => {
     console.log(error);
   }
 
-  res.sendStatus(201);
+  return res.sendStatus(201);
 });
 
 server.get("/participants", async (req, res) => {
@@ -74,9 +74,9 @@ server.get("/participants", async (req, res) => {
       .collection("uol_participants")
       .find()
       .toArray();
-    res.send(participants);
+    return res.send(participants);
   } catch (error) {
-    res.status(500);
+    return res.status(500);
   }
 });
 
@@ -91,10 +91,10 @@ server.post("/messages", async (req, res) => {
       .find({ name: from });
 
     if (!userExisting) {
-      res.send({ error: "user não está na sala" });
+      return res.send({ error: "usuário não está na sala" });
     }
   } catch (error) {
-    res.sendStatus(500);
+    return res.sendStatus(500);
   }
 
   //valida campos da mensagem
@@ -119,7 +119,7 @@ server.post("/messages", async (req, res) => {
     time,
   });
 
-  res.sendStatus(201);
+  return res.sendStatus(201);
 });
 
 server.get("/messages", async (req, res) => {
@@ -139,7 +139,7 @@ server.get("/messages", async (req, res) => {
     //aplicando limite de mensagens
     limit ? res.send(messagesFilter.slice(-limit)) : res.send(messagesFilter);
   } catch (error) {
-    res.sendStatus(500);
+    return res.sendStatus(500);
   }
 });
 
@@ -156,13 +156,14 @@ server.post("/status", async (req, res) => {
       await db
         .collection("uol_participants")
         .updateOne({ name: user }, { $set: { lastStatus: Date.now() } });
-      res.sendStatus(200);
+      return res.sendStatus(200);
     } else {
       return res.sendStatus(404);
     }
   } catch (error) {
-    res.sendStatus(500);
+    return res.sendStatus(500);
   }
 });
+
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
