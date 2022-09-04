@@ -153,6 +153,10 @@ server.post("/status", async (req, res) => {
 
     if (userPresent) {
       //atualiza status
+      await db
+        .collection("uol_participants")
+        .updateOne({ name: user }, { $set: { lastStatus: Date.now() } });
+      res.sendStatus(200);
     } else {
       return res.sendStatus(404);
     }
