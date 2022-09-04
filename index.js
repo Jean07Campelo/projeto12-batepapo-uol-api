@@ -70,7 +70,10 @@ server.post("/participants", async (req, res) => {
 
 server.get("/participants", async (req, res) => {
   try {
-    const participants = await db.collection("uol_participants").find().toArray();
+    const participants = await db
+      .collection("uol_participants")
+      .find()
+      .toArray();
     res.send(participants);
   } catch (error) {
     res.status(500);
@@ -120,9 +123,8 @@ server.post("/messages", async (req, res) => {
 });
 
 server.get("/messages", async (req, res) => {
-
   const limit = req.query.limit;
-  
+
   //retornando todas mensagens quando nao há valor no limit
   if (!limit) {
     try {
@@ -133,6 +135,13 @@ server.get("/messages", async (req, res) => {
     }
   }
 
+  //retronando quantidade de mensagens de acordo com valor limit
+  try {
+    const messages = await db.collection("uol_messages").find().toArray();
+    res.send(messages.slice(-limit));
+  } catch (error) {
+    res.sendStatus(500);
+  }
 });
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
