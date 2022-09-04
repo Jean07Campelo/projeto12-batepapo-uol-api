@@ -165,5 +165,25 @@ server.post("/status", async (req, res) => {
   }
 });
 
+setInterval(async () => {
+  try {
+    const participants = await db
+      .collection("uol_participants")
+      .find()
+      .toArray();
+    participants.map((item) => validate(item));
+  } catch (error) {
+    res.sendStatus(500);
+  }
+
+  //valida tempo do usuário na sala
+  async function validate(user) {
+    const timeNow = Date.now();
+    if (timeNow - user.lastStatus <= 10000) {
+      await db.collection("uol_participants").deleteOne({ name: user.name });
+    }
+  }
+}, 15000);
+
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
