@@ -143,4 +143,9 @@ server.get("/messages", async (req, res) => {
   }
 });
 
+server.post("/status", (req, res) => {
+  const { user } = req.headers;
+  
+})
+
 server.listen(port, () => console.log(`Listening on port ${port}`));
