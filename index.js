@@ -124,6 +124,7 @@ server.post("/messages", async (req, res) => {
 
 server.get("/messages", async (req, res) => {
   const limit = req.query.limit;
+  const userRequest = req.headers.user;
 
   //retornando todas mensagens quando nao há valor no limit
   if (!limit) {
@@ -135,7 +136,7 @@ server.get("/messages", async (req, res) => {
     }
   }
 
-  //retronando quantidade de mensagens de acordo com valor limit
+  //retornando quantidade de mensagens de acordo com valor limit
   try {
     const messages = await db.collection("uol_messages").find().toArray();
     res.send(messages.slice(-limit));
