@@ -143,9 +143,22 @@ server.get("/messages", async (req, res) => {
   }
 });
 
-server.post("/status", (req, res) => {
+server.post("/status", async (req, res) => {
   const { user } = req.headers;
-  
-})
+
+  try {
+    const userPresent = await db
+      .collection("uol_participants")
+      .findOne({ name: user });
+
+    if (userPresent) {
+      //atualiza status
+    } else {
+      return res.sendStatus(404);
+    }
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
