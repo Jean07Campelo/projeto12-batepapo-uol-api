@@ -123,13 +123,16 @@ server.get("/messages", async (req, res) => {
 
   const limit = req.query.limit;
   
-
-  try {
-    const messages = await db.collection("uol_messages").find().toArray();
-    res.send(messages);
-  } catch (error) {
-    res.sendStatus(500);
+  //retornando todas mensagens quando nao há valor no limit
+  if (!limit) {
+    try {
+      const messages = await db.collection("uol_messages").find().toArray();
+      res.send(messages);
+    } catch (error) {
+      res.sendStatus(500);
+    }
   }
+
 });
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
