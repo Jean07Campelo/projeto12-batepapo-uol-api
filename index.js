@@ -126,23 +126,42 @@ server.get("/messages", async (req, res) => {
   const limit = req.query.limit;
   const userRequest = req.headers.user;
 
+  //filtrando mensagens privadas de userRequest:
+  try {
+    const privateMessages = await db
+      .collection("uol_messages")
+      .find({ from: userRequest })
+      .toArray();
+
+    res.send(privateMessages);
+
+    console.log(privateMessages);
+
+  } catch (error) {
+    res.sendStatus(500);
+  }
+
   //retornando todas mensagens quando nao há valor no limit
   if (!limit) {
     try {
-      const messages = await db.collection("uol_messages").find().toArray();
+      const messages = await db.collection("uol_messages").find({ from: userRequest }).toArray();
       res.send(messages);
     } catch (error) {
       res.sendStatus(500);
     }
   }
-
+  
+  
   //retornando quantidade de mensagens de acordo com valor limit
   try {
-    const messages = await db.collection("uol_messages").find().toArray();
+    const messages = await db.collection("uol_messages").find({ from: userRequest }).toArray();
     res.send(messages.slice(-limit));
   } catch (error) {
     res.sendStatus(500);
   }
+
+
+
 });
 
 server.listen(port, () => console.log(`Listening on port ${port}`));
