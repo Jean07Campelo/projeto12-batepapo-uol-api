@@ -179,11 +179,11 @@ setInterval(async () => {
   //valida tempo do usuário na sala
   async function validate(user) {
     const timeNow = Date.now();
-    if (timeNow - user.lastStatus <= 10000) {
+    if (timeNow - user.lastStatus >= 10000) {
       await db.collection("uol_participants").deleteOne({ name: user.name });
       //salvando status de saida
       const time = dayjs(timeNow).format("HH:mm:ss");
-      db.collection("uol_messages").insertOne({
+      await db.collection("uol_messages").insertOne({
         from: user.name,
         to: "Todos",
         text: "sai da sala...",
