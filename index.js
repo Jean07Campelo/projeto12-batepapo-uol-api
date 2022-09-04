@@ -120,6 +120,10 @@ server.post("/messages", async (req, res) => {
 });
 
 server.get("/messages", async (req, res) => {
+
+  const limit = req.query.limit;
+  
+
   try {
     const messages = await db.collection("uol_messages").find().toArray();
     res.send(messages);
