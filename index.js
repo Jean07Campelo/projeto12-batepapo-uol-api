@@ -44,7 +44,9 @@ server.post("/participants", async (req, res) => {
     const nameExisting = dataUsers.find((user) => user.name === name);
 
     //valida usuário existente:
-    if (nameExisting) return res.send(409);
+    if (nameExisting) {
+      return res.send(409);
+    }
 
     //salva participante no banco:
     db.collection("uol_participants").insertOne({
@@ -54,7 +56,7 @@ server.post("/participants", async (req, res) => {
 
     //salvando status participante
     const time = dayjs(Date.now()).format("HH:mm:ss");
-    db.collection("uol_status").insertOne({
+    db.collection("uol_messages").insertOne({
       from: name,
       to: "Todos",
       text: "entra na sala...",
@@ -62,7 +64,7 @@ server.post("/participants", async (req, res) => {
       time: time,
     });
   } catch (error) {
-    console.log(error);
+    return res.sendStatus(500);
   }
 
   return res.sendStatus(201);
@@ -84,7 +86,7 @@ server.post("/messages", async (req, res) => {
   const { to, text, type } = req.body;
   const from = req.headers.user;
 
-  //valida usuario FROM
+  //valida usuario FROM no banco de dados
   try {
     const userExisting = await db
       .collection("uol_participants")
@@ -93,11 +95,9 @@ server.post("/messages", async (req, res) => {
     if (!userExisting) {
       return res.send({ error: "usuário não está na sala" });
     }
-  } catch (error) {
-    return res.sendStatus(500);
-  }
 
-  //valida campos da mensagem
+
+    //valida campos da mensagem
   const validateMessage = messageSchema.validate(req.body, {
     abortEarly: false,
   });
@@ -119,6 +119,10 @@ server.post("/messages", async (req, res) => {
     time,
   });
 
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+
   return res.sendStatus(201);
 });
 
@@ -126,7 +130,7 @@ server.get("/messages", async (req, res) => {
   const limit = req.query.limit;
   const userRequest = req.headers.user;
 
-  //retornando mensagens filtradas
+  //filtrando mensagens de acordo com usuário logado
   try {
     const messages = await db.collection("uol_messages").find().toArray();
     const messagesFilter = messages.filter(
@@ -165,7 +169,7 @@ server.post("/status", async (req, res) => {
   }
 });
 
-setInterval(async () => {
+setInterval( async () => {
   try {
     const participants = await db
       .collection("uol_participants")
@@ -178,8 +182,10 @@ setInterval(async () => {
 
   //valida tempo do usuário na sala
   async function validate(user) {
+    const timeLimit = 10000;
     const timeNow = Date.now();
-    if (timeNow - user.lastStatus >= 10000) {
+    if (timeNow - user.lastStatus > timeLimit) {
+      //remove usuário
       await db.collection("uol_participants").deleteOne({ name: user.name });
       //salvando status de saida
       const time = dayjs(timeNow).format("HH:mm:ss");
