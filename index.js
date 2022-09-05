@@ -35,7 +35,7 @@ server.post("/participants", async (req, res) => {
 
   if (validationName.error) {
     const errors = validationName.error.details.map((detail) => detail.message);
-    res.status(400).send(errors);
+    res.sendStatus(400).send(errors);
     return;
   }
 
@@ -45,7 +45,7 @@ server.post("/participants", async (req, res) => {
 
     //valida usuário existente:
     if (nameExisting) {
-      return res.send(409);
+      return res.sendStatus(409);
     }
 
     //salva participante no banco:
@@ -78,7 +78,7 @@ server.get("/participants", async (req, res) => {
       .toArray();
     return res.send(participants);
   } catch (error) {
-    return res.status(500);
+    return res.sendStatus(500);
   }
 });
 
@@ -105,7 +105,7 @@ server.post("/messages", async (req, res) => {
     const errors = validateMessage.error.details.map(
       (detail) => detail.message
     );
-    res.status(422).send(errors);
+    res.sendStatus(422).send(errors);
     return;
   }
 
