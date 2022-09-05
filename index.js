@@ -177,7 +177,7 @@ setInterval( async () => {
       .toArray();
     participants.map((item) => validate(item));
   } catch (error) {
-    res.sendStatus(500);
+    
   }
 
   //valida tempo do usuário na sala
